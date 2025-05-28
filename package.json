@@ -12,7 +12,7 @@
     "web:build": "nx run web:build:production",
     "web:start": "nx run web:serve:production",
     "scheduler": "nx run scheduler:serve",
-    "scheduler:build": "nx run scheduler:build:production",
+    "scheduler:build": "nx run scheduler:build:production ",
     "scheduler:start": "nx run scheduler:serve:production"
   },
   "dependencies": {
