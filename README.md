@@ -1,12 +1,12 @@
-# Token Lockup and SPL Smart Contracts
 
-**WARNING: DO NOT DEPLOY THE `main` BRANCH TO A PRODUCTION ENVIRONMENT SUCH AS ETHEREUM MAINNET** 
+![GLITCH-APP](https://github.com/user-attachments/assets/94da0abb-6822-4b49-9f2e-cc9aaad3606b)
 
-The code in the main branch is under active development and there may be significant bugs or security issues introduced that have not been caught by code review or independent security auditors.  
+
+# Glitch.LOCK - Lock, Secure and Vest
+
+The code in the main branch is under active development and there may be bugs or security issues introduced that have not been caught by code review or independent security auditors.  
 
 It is recommended you use versioned releases where there is an attached audit report. The independent audits are typically conducted for specific git commit identifiers specified in the security audit reports. It is highly advisable to perform your own audit of the smart contracts to both understand what you are deploying and to independently assess the security of the code.
-
-This Open Source software is provided "as is" with no warranty as specified in the [LICENSE](LICENSE) file.
 
 ## Overview
 
@@ -36,7 +36,6 @@ This is an Solana SPL standard compatible token and TokenLockup scheduled releas
 
 # Dev Environment
 
-Clone this repo and `cd` into root. Then:
 The following dependencies are required to build and run this example, depending
 on your OS, they may already be installed:
 
