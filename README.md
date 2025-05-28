@@ -1,190 +1,114 @@
-# valhalla
+# Token Lockup and SPL Smart Contracts
 
-This project is generated with the [create-solana-dapp](https://github.com/solana-developers/create-solana-dapp) generator.
+**WARNING: DO NOT DEPLOY THE `main` BRANCH TO A PRODUCTION ENVIRONMENT SUCH AS ETHEREUM MAINNET** 
 
-## Getting Started
+The code in the main branch is under active development and there may be significant bugs or security issues introduced that have not been caught by code review or independent security auditors.  
 
-### Prerequisites
+It is recommended you use versioned releases where there is an attached audit report. The independent audits are typically conducted for specific git commit identifiers specified in the security audit reports. It is highly advisable to perform your own audit of the smart contracts to both understand what you are deploying and to independently assess the security of the code.
 
-- Node v18.18.0 or higher
+This Open Source software is provided "as is" with no warranty as specified in the [LICENSE](LICENSE) file.
 
-- Rust v1.70.0 or higher
-- Anchor CLI 0.29.0 or higher
-- Solana CLI 1.17.0 or higher
+## Overview
 
-### Installation
+This is an Solana SPL standard compatible token and TokenLockup scheduled release "vesting" smart contract that:
 
-#### Clone the repo
+* Does not have centralized controllers or admin roles to demonstrate strong decentralization and increased trust
+* Can enforce a scheduled release of tokens (e.g. investment lockups)
+* The maximum number of tokens is minted on deployment and it is not possible exceed this number
+* Smart contract enforced lockup schedules are used to control the circulating supply instead of inflationary minting. 
+* Allows for burning tokens to reduce supply (e.g. for permanent cross chain transfers to a new blockchain and burning excess reserve tokens to support token price)
+* Optimized to decrease the use of gas for the costly transfer schedules
 
-```shell
-git clone <repo-url>
-cd <repo-name>
+### At A Glance
+
+| Feature               | Value                                                        |
+| --------------------- | ------------------------------------------------------------ |
+| Network               | Solana                                                       |
+| Protocol              | SPL                                                          |
+| `mint()`              | no tokens minted ever after deployment                       |
+| `freeze()`            | never                                                        |
+| `burn()`              | Only from transaction senders own wallet address. No one can burn from someone else's address. |
+| Admin Roles           | None                                                         |
+| Upgradeable           | No                                                           |
+| Transfer Restrictions | None                                                         |
+| Additional Functions  | Unlock Schedule related functions                            |
+| Griefer Protection    | Minimum locked scheduled token amount slashing               |
+
+# Dev Environment
+
+Clone this repo and `cd` into root. Then:
+The following dependencies are required to build and run this example, depending
+on your OS, they may already be installed:
+
+- Install node (v14 recommended)
+- Install npm
+- Install the latest Rust stable from https://rustup.rs/
+- Install Solana v1.7.11 or later from
+  https://docs.solana.com/cli/install-solana-cli-tools
+
+If this is your first time using Rust, these [Installation
+Notes](README-installation-notes.md) might be helpful.
+
+### Configure CLI
+
+> If you're on Windows, it is recommended to use [WSL](https://docs.microsoft.com/en-us/windows/wsl/install-win10) to run these commands
+
+1. Set CLI config url to localhost cluster
+
+```bash
+solana config set --url localhost
 ```
 
-#### Install Dependencies
+2. Create CLI Keypair
 
-```shell
+If this is your first time using the Solana CLI, you will need to generate a new keypair:
+
+```bash
+solana-keygen new
+```
+
+### Start local Solana cluster
+
+This example connects to a local Solana cluster by default.
+
+Start a local Solana cluster:
+```bash
+solana-test-validator
+```
+> **Note**: You may need to do some [system tuning](https://docs.solana.com/running-validator/validator-start#system-tuning) (and restart your computer) to get the validator to run
+
+Listen to transaction logs:
+```bash
+solana logs
+```
+
+### Install npm dependencies
+
+```bash
 npm install
 ```
 
-#### Start the web app
+### Build the on-chain program
 
-```
-npm run dev
-```
+There is both a Rust and C version of the on-chain program, whichever is built
+last will be the one used when running the example.
 
-## Apps
-
-### anchor
-
-This is a Solana program written in Rust using the Anchor framework.
-
-#### Commands
-
-You can use any normal anchor commands. Either move to the `anchor` directory and run the `anchor` command or prefix the command with `npm run`, eg: `npm run anchor`.
-
-#### Sync the program id:
-
-Running this command will create a new keypair in the `anchor/target/deploy` directory and save the address to the Anchor config file and update the `declare_id!` macro in the `./src/lib.rs` file of the program.
-
-You will manually need to update the constant in `anchor/lib/basic-exports.ts` to match the new program id.
-
-```shell
-npm run anchor keys sync
+```bash
+npm run build:program-rust
 ```
 
-#### Build the program:
-
-```shell
-npm run anchor-build
+```bash
+npm run build:program-c
 ```
 
-#### Start the test validator with the program deployed:
+### Deploy the on-chain program
 
-```shell
-npm run anchor-localnet
+```bash
+solana program deploy dist/program/helloworld.so
 ```
 
-#### Run the tests
+### Run the JavaScript client
 
-```shell
-npm run anchor-test
+```bash
+npm run start
 ```
-
-#### Deploy to Devnet
-
-```shell
-npm run anchor deploy --provider.cluster devnet
-```
-
-### web
-
-This is a React app that uses the Anchor generated client to interact with the Solana program.
-
-#### Commands
-
-Start the web app
-
-```shell
-npm run dev
-```
-
-Build the web app
-
-```shell
-npm run build
-```
-
-# Deployments
-
-## Mainnet Deployment
-
-N/A
-
-## Devnet Deployment
-
- ~/Workspace/valhalla/ [main] yarn anchor deploy -- --provider.cluster devnet
-yarn run v1.22.21
-warning From Yarn 1.0 onwards, scripts don't require "--" for options to be forwarded. In a future version, any explicit "--" will be forwarded as-is to the scripts.
-$ nx run anchor:anchor deploy --provider.cluster devnet
-
-> nx run anchor:anchor deploy --provider.cluster devnet
-
-Deploying cluster: https://api.devnet.solana.com
-Upgrade authority: ./.keys/id.json
-Deploying program "valhalla"...
-Program path: /Users/mmelvin0x/Workspace/valhalla/anchor/target/deploy/valhalla.so...
-Program Id: Ct63b5aLvhYT2bSvK3UG3oTJF8PgAC3MzDwpqXRKezF6
-
-Deploy success
-
-——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-
-NX Successfully ran target anchor for project anchor (58s)
-
-      With additional flags:
-        deploy
-        --provider={"cluster":"devnet"}
-
-✨ Done in 58.13s.
- ~/Workspace/valhalla/ [main*] yarn anchor run init --provider.cluster devnet
-yarn run v1.22.21
-$ nx run anchor:anchor run init --provider.cluster devnet
-
-> nx run anchor:anchor run init --provider.cluster devnet
-
-warning package.json: No license field
-$ /Users/mmelvin0x/Workspace/valhalla/anchor/node_modules/.bin/ts-node ./scripts/init.ts
-👨‍💻 Deployer: AUcxPLH8dQ7gDFTt6N4Cp57JQtqBnd3H9yrdyGKZpAtA
-🔐 Config: 38wmZoG3WGwkjmHr39UnYYPfB8CyHFLnUWuLDYDSE2ku
-✅ Initialization Transaction: 2vuUUctEBFtxjM4bo5PqRJUUrYpayHjmp2MCwubm7UQ62E38X26UUkwEmr3U5A2ePHXhwyc9j9pHuoyCp4HSK4zS
-🐸 Admin: AUcxPLH8dQ7gDFTt6N4Cp57JQtqBnd3H9yrdyGKZpAtA
-💰 SOL Treasury: AUcxPLH8dQ7gDFTt6N4Cp57JQtqBnd3H9yrdyGKZpAtA
-💰 Token Treasury:: AUcxPLH8dQ7gDFTt6N4Cp57JQtqBnd3H9yrdyGKZpAtA
-🫡 Reward Mint: Gb8Gx4TbGKnwaAkg3oF2crDdrHvx11CizPmkskoPy4YV
-❤️‍🩹 SOL Fee: 0.05
-❤️‍🩹 Token Fee BPS: 50
-🪙 Reward Token Amount: 1000000000
-
-——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-
-NX Successfully ran target anchor for project anchor (10s)
-
-      With additional flags:
-        run init
-        --provider={"cluster":"devnet"}
-
-✨ Done in 10.95s.
- ~/Workspace/valhalla/ [main*] yarn anchor run create-data --provider.cluster devnet
-yarn run v1.22.21
-$ nx run anchor:anchor run create-data --provider.cluster devnet
-
-> nx run anchor:anchor run create-data --provider.cluster devnet
-
-warning package.json: No license field
-$ /Users/mmelvin0x/Workspace/valhalla/anchor/node_modules/.bin/ts-node ./scripts/create-data.ts
-User one: J7eKcBfEkVpt5iGGTGL7oXX9RcSBR7vGihkSisjpbyoB
-User two: GQg22KPsLhEysUHsKdz4RxEW5oWTFQa4A7oQgvsSP6x6
-Creating SPL vaults...
-Creating Token 2022 vaults...
-Created SPL vault 1/5
-Created Token 2022 vault 1/5
-Created SPL vault 2/5
-Created Token 2022 vault 2/5
-Created SPL vault 3/5
-Created Token 2022 vault 3/5
-Created SPL vault 4/5
-Created Token 2022 vault 4/5
-Created SPL vault 5/5
-Created Token 2022 vault 5/5
-
-——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-
-NX Successfully ran target anchor for project anchor (1m)
-
-      With additional flags:
-        run create-data
-        --provider={"cluster":"devnet"}
-
-✨ Done in 84.37s.
- ~/Workspace/valhalla/ [main*]
